@@ -18,4 +18,8 @@ public class Tarefa {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "id_rotina")
+    private Rotina rotina;
 }
