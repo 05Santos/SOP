@@ -1,6 +1,8 @@
 package com.sop.controller;
 
 import com.sop.model.Notificacoes;
+import com.sop.service.NotificacaoService;
+import com.sop.service.RotinaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,41 +11,57 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/notificacoes")
+@CrossOrigin(origins = "*")
 public class NotificacoesController {
 
     @Autowired
-    private NotificacoesController notificacaoService;
+    private NotificacaoService notificacaoService;
+    @Autowired
+    private RotinaService rotinaService;
 
-    // Criar nova notificação
-    @PostMapping
-    public ResponseEntity<Notificacoes> criar(@RequestBody Notificacoes notificacao) {
-        Notificacoes nova = notificacaoService.criarNotificacao(notificacao);
-        return ResponseEntity.ok(nova);
-    }
-    // Listar todas as notificações
+    //Listar todas as notificacoes
     @GetMapping
-    public ResponseEntity<List<Notificacoes>> listar() {
-        return ResponseEntity.ok(notificacaoService.listarNotificacoes());
+    public List<Notificacoes> listar() {return notificacaoService.listarTodos();}
+
+    //Buscar rotinas por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Notificacoes> buscarPorId(@PathVariable Long id) {
+        return notificacaoService.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // Listar notificações por usuário
-    @GetMapping("/usuario/{idUsuario}")
-    public ResponseEntity<List<Notificacoes>> listarPorUsuario(@PathVariable Long idUsuario) {
-        return ResponseEntity.ok(notificacaoService.listarPorUsuario(idUsuario));
+    //Criar nova Notificação
+    @PostMapping
+    public ResponseEntity<Notificacoes> criar(@RequestBody Notificacoes notificacoes) {
+        try{
+            Notificacoes nova = notificacaoService.salvar(notificacoes);
+            return ResponseEntity.ok(nova);
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(notificacoes);
+        }
     }
 
-    // Marcar notificação como lida
-    @PutMapping("/{id}/lida")
-    public ResponseEntity<Notificacoes> marcarComoLida(@PathVariable Long id) {
-        Notificacoes lida = notificacaoService.marcarComoLida(id);
-        return ResponseEntity.ok(lida);
+    //Atualizar rotina
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Notificacoes notificacoes) {
+        try{
+            Notificacoes atualizada = notificacaoService.atualizar(id, notificacoes);
+            return ResponseEntity.ok(atualizada);
+        }catch (RuntimeException e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    // Excluir notificação
+    //Deletar rotina
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        notificacaoService.excluirNotificacao(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> remover(@PathVariable Long id) {
+        try {
+            notificacaoService.deletar(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
 
