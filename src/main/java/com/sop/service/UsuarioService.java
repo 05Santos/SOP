@@ -29,6 +29,7 @@ public class UsuarioService {
         }
         return usuarioRepository.save(usuario);
     }
+
     public Usuario atualizar (Long id, Usuario novoUsuario){
         return usuarioRepository.findById(id)
                 .map(usuario -> {
