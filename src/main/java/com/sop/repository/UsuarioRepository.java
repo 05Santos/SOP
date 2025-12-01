@@ -10,4 +10,9 @@ import java.util.Optional;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Optional<Usuario> findByEmail(String email);
+    // Método de consulta personalizado.
+    // O Spring Data JPA cria automaticamente a query:
+    // SELECT * FROM usuario WHERE email = ?;
+    //
+    // Retorna um Optional para evitar NullPointerException
 }

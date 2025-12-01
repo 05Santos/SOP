@@ -19,6 +19,7 @@ public class TarefaService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    // Retorna todas as tarefas cadastradas
     public List<Tarefa> listarTodas() {
         return tarefaRepository.findAll();
     }
@@ -28,7 +29,9 @@ public class TarefaService {
                 .orElseThrow(() -> new RuntimeException("Tarefa não encontrada."));
     }
 
+    // Salva uma tarefa no banco de dados, validando o usuário antes
     public Tarefa salvar(Tarefa tarefa) {
+
         if(tarefa.getUsuario() == null || tarefa.getUsuario().getId() == null){
             throw new IllegalArgumentException("Usuário da tarefa não informado.");
         }
@@ -36,6 +39,7 @@ public class TarefaService {
         Usuario usuario = usuarioRepository.findById(tarefa.getUsuario().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
+        // Vincula o usuário validado à tarefa
         tarefa.setUsuario(usuario);
         return tarefaRepository.save(tarefa);
     }
